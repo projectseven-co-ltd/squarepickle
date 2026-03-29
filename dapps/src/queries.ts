@@ -50,9 +50,33 @@ export interface CharacterInfo {
 
 // ── Fetch owner caps from wallet address ──────────────────────────────────────
 export async function fetchOwnerCaps(walletAddress: string): Promise<{ type: string; authorizedId: string }[]> {
-  const data = await gql(`
+  // Step 1: wallet address holds PlayerProfile which has character_id
+  const walletData = await gql(`
     query {
       address(address: "${walletAddress}") {
+        objects(first: 10) {
+          nodes {
+            contents {
+              type { repr }
+              json
+            }
+          }
+        }
+      }
+    }
+  `);
+
+  const walletNodes = walletData?.address?.objects?.nodes ?? [];
+  const profileNode = walletNodes.find((n: any) =>
+    n?.contents?.type?.repr?.includes('::character::PlayerProfile')
+  );
+  const characterId = profileNode?.contents?.json?.character_id;
+  if (!characterId) throw new Error('No character found for this wallet');
+
+  // Step 2: character_id holds all the OwnerCaps
+  const charData = await gql(`
+    query {
+      address(address: "${characterId}") {
         objects(first: 50) {
           nodes {
             contents {
@@ -65,7 +89,7 @@ export async function fetchOwnerCaps(walletAddress: string): Promise<{ type: str
     }
   `);
 
-  const nodes = data?.address?.objects?.nodes ?? [];
+  const nodes = charData?.address?.objects?.nodes ?? [];
   return nodes
     .filter((n: any) => n?.contents?.type?.repr?.includes('::access::OwnerCap'))
     .map((n: any) => ({
