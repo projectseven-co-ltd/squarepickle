@@ -4,11 +4,11 @@
 const GRAPHQL_ENDPOINT = import.meta.env.VITE_SUI_GRAPHQL_ENDPOINT || 'https://graphql.testnet.sui.io/graphql';
 export const DEFAULT_WALLET = '0x5c6c0edea73a486221651526694e03756066ec7994bc53a7b7458294ab4f79fc';
 
-async function gql(query: string, variables?: Record<string, unknown>) {
+async function gql(query: string) {
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query }),
   });
   const json = await res.json();
   if (json.errors) throw new Error(json.errors[0].message);
@@ -51,8 +51,8 @@ export interface CharacterInfo {
 // ── Fetch owner caps from wallet address ──────────────────────────────────────
 export async function fetchOwnerCaps(walletAddress: string): Promise<{ type: string; authorizedId: string }[]> {
   const data = await gql(`
-    query GetOwnerCaps($addr: SuiAddress!) {
-      address(address: $addr) {
+    query {
+      address(address: "${walletAddress}") {
         objects(first: 50) {
           nodes {
             contents {
@@ -63,7 +63,7 @@ export async function fetchOwnerCaps(walletAddress: string): Promise<{ type: str
         }
       }
     }
-  `, { addr: walletAddress });
+  `);
 
   const nodes = data?.address?.objects?.nodes ?? [];
   return nodes
@@ -78,14 +78,14 @@ export async function fetchOwnerCaps(walletAddress: string): Promise<{ type: str
 // ── Fetch a single object by address ─────────────────────────────────────────
 async function fetchObject(id: string): Promise<{ typeRepr: string; json: any } | null> {
   const data = await gql(`
-    query GetObject($id: SuiAddress!) {
-      object(address: $id) {
+    query {
+      object(address: "${id}") {
         asMoveObject {
           contents { type { repr } json }
         }
       }
     }
-  `, { id });
+  `);
 
   const contents = data?.object?.asMoveObject?.contents;
   if (!contents) return null;
