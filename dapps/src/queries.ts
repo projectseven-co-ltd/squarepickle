@@ -2,6 +2,7 @@
 // Hitting: https://graphql.testnet.sui.io/graphql
 
 const GRAPHQL_ENDPOINT = import.meta.env.VITE_SUI_GRAPHQL_ENDPOINT || 'https://graphql.testnet.sui.io/graphql';
+export const DEFAULT_WALLET = '0x5c6c0edea73a486221651526694e03756066ec7994bc53a7b7458294ab4f79fc';
 
 async function gql(query: string, variables?: Record<string, unknown>) {
   const res = await fetch(GRAPHQL_ENDPOINT, {

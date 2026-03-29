@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import './main.css';
-import { fetchDashboard, AssemblyRecord, CharacterInfo } from './queries';
+import { fetchDashboard, AssemblyRecord, CharacterInfo, DEFAULT_WALLET } from './queries';
 import { AssemblyCard } from './AssemblyCard';
 
-const WALLET_ADDRESS = import.meta.env.VITE_CHARACTER_ID || '';
+const WALLET_ADDRESS = import.meta.env.VITE_CHARACTER_ID || DEFAULT_WALLET;
 
 function abbreviate(addr: string) {
   return addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '';
