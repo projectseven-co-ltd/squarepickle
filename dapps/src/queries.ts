@@ -44,6 +44,7 @@ export interface AssemblyRecord {
 export interface CharacterInfo {
   id: string;
   name: string;
+  itemId: string;   // EVE character ID — used for portrait lookup
   tribeId: number;
   walletAddress: string;
 }
@@ -176,6 +177,7 @@ export async function fetchDashboard(walletAddress: string): Promise<{
       character = {
         id,
         name: json?.metadata?.name || 'Unknown',
+        itemId: json?.key?.item_id || '',
         tribeId: json?.tribe_id ?? 0,
         walletAddress: json?.character_address ?? walletAddress,
       };

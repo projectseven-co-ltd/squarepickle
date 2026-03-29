@@ -76,7 +76,16 @@ export default function App() {
         {/* Character Banner */}
         {character && (
           <div className="sp-char-banner">
-            <div className="sp-char-avatar">🦝</div>
+            <div className="sp-char-avatar">
+              {character.itemId ? (
+                <img
+                  src={`https://images.evetech.net/characters/${character.itemId}/portrait?size=128`}
+                  alt={character.name}
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : '🦝'}
+            </div>
             <div>
               <div className="sp-char-name">{character.name}</div>
               <div className="sp-char-meta">
